@@ -1,0 +1,18 @@
+# Databricks App configuration
+# Deploy with: databricks apps deploy deep-agent-memory --source-code-path ./07_Deep_Agents/app
+
+command:
+  - uvicorn
+  - backend.main:app
+  - --host
+  - 0.0.0.0
+  - --port
+  - "8000"
+
+env:
+  - name: TAVILY_API_KEY
+    valueFrom: TAVILY_API_KEY
+  - name: DATABRICKS_HOST
+    valueFrom: DATABRICKS_HOST
+  - name: DATABRICKS_TOKEN
+    valueFrom: DATABRICKS_TOKEN
