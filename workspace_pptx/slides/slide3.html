@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html { background: #F8FAFC; }
+body {
+  width: 720pt; height: 405pt; margin: 0; padding: 0;
+  background: #F8FAFC; font-family: Arial, sans-serif;
+  display: flex; color: #0B1426;
+}
+.header {
+  position: absolute; top: 28pt; left: 40pt; right: 40pt;
+  display: flex; align-items: center;
+}
+.section-num {
+  font-size: 11pt; color: #F43F5E; font-weight: bold;
+  letter-spacing: 3pt; margin: 0;
+}
+.section-line {
+  flex: 1; height: 2pt; background: #E2E8F0;
+  margin: 0 16pt;
+}
+.section-tag {
+  font-size: 11pt; color: #64748B; letter-spacing: 3pt;
+  margin: 0;
+}
+.title-area {
+  position: absolute; top: 60pt; left: 40pt; width: 640pt;
+}
+.title {
+  font-size: 28pt; font-weight: bold; color: #0B1426;
+  margin: 0 0 6pt 0; line-height: 1.15;
+}
+.subtitle {
+  font-size: 12pt; color: #475569; margin: 0;
+}
+.grid {
+  position: absolute; top: 130pt; left: 40pt;
+  width: 640pt; height: 230pt;
+  display: flex; flex-wrap: wrap;
+}
+.card {
+  width: 200pt; height: 78pt;
+  background: #FFFFFF; margin: 0 10pt 8pt 0;
+  padding: 10pt 14pt; border-left: 4pt solid #F43F5E;
+  box-shadow: 1px 2px 6px rgba(15, 23, 42, 0.08);
+}
+.card-num {
+  font-size: 9pt; color: #F43F5E; font-weight: bold;
+  letter-spacing: 2pt; margin: 0 0 3pt 0;
+}
+.card-title {
+  font-size: 12pt; font-weight: bold; color: #0B1426;
+  margin: 0 0 4pt 0; line-height: 1.15;
+}
+.card-text {
+  font-size: 9pt; color: #475569; line-height: 1.35;
+  margin: 0;
+}
+.footer-bar {
+  position: absolute; bottom: 0; left: 0;
+  width: 720pt; height: 8pt; background: #F43F5E;
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <p class="section-num">02 // LIMITATIONS</p>
+  <div class="section-line"></div>
+  <p class="section-tag">WHY STOCK LANGGRAPH FALLS SHORT</p>
+</div>
+
+<div class="title-area">
+  <h1 class="title">Six pain points building this in raw LangGraph</h1>
+  <p class="subtitle">Each one is solvable — but you end up rebuilding the same harness, over and over.</p>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <p class="card-num">01</p>
+    <p class="card-title">Manual State Plumbing</p>
+    <p class="card-text">Custom reducers, MessagesState extensions, and channel wiring for every new field.</p>
+  </div>
+  <div class="card">
+    <p class="card-num">02</p>
+    <p class="card-title">Context Pollution</p>
+    <p class="card-text">All subagent messages flow back to the supervisor — token explosion across 8 agents.</p>
+  </div>
+  <div class="card">
+    <p class="card-num">03</p>
+    <p class="card-title">No First-Class Planning</p>
+    <p class="card-text">ReAct-only loops. No built-in TODO list, no scratchpad, no plan-execute scaffolding.</p>
+  </div>
+  <div class="card">
+    <p class="card-num">04</p>
+    <p class="card-title">Tool Result Bloat</p>
+    <p class="card-text">Large web search and SQL results clog the orchestrator's window with no offload primitive.</p>
+  </div>
+  <div class="card">
+    <p class="card-num">05</p>
+    <p class="card-title">Boilerplate Subagents</p>
+    <p class="card-text">Each subagent = bespoke graph, prompt, tool wiring, recursion guards. Repeat × 8.</p>
+  </div>
+  <div class="card">
+    <p class="card-num">06</p>
+    <p class="card-title">No File System Primitive</p>
+    <p class="card-text">No standard way to share artifacts between agents — invent your own every time.</p>
+  </div>
+</div>
+
+<div class="footer-bar"></div>
+</body>
+</html>
