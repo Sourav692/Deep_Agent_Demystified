@@ -3,17 +3,32 @@ bundle:
 
 targets:
   dev:
-    mode: development
     default: true
     workspace:
       host: https://e2-demo-field-eng.cloud.databricks.com
 
   staging:
-    mode: production
     workspace:
       host: https://e2-demo-field-eng.cloud.databricks.com
 
   prod:
-    mode: production
     workspace:
       host: https://e2-demo-field-eng.cloud.databricks.com
+
+resources:
+  apps:
+    deep_agent_memory:
+      name: "deep-agent-memory-${bundle.target}"
+      description: "Deep Agent Memory Command Center"
+      source_code_path: ./app
+
+sync:
+  paths:
+    - app
+  include:
+    - app/frontend/build/**
+  exclude:
+    - app/frontend/node_modules/**
+    - app/frontend/src/**
+    - app/frontend/public/**
+    - app/**/__pycache__/**
