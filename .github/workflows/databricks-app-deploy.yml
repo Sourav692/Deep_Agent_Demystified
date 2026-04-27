@@ -36,7 +36,11 @@ jobs:
         env:
           NODE_ENV: development
         run: |
-          npm ci --include=dev
+          # package-lock.json resolved URLs point to an internal Databricks
+          # npm proxy that GitHub-hosted runners cannot reach; rewrite to
+          # the public registry. Integrity hashes remain valid (same bytes).
+          sed -i 's|https://npm-proxy\.dev\.databricks\.com/|https://registry.npmjs.org/|g' package-lock.json
+          npm ci --include=dev --registry=https://registry.npmjs.org/ --no-audit --no-fund
           npm run build
 
       - name: Setup Databricks CLI
