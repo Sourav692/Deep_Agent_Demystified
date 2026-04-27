@@ -1,0 +1,81 @@
+name: Deploy Databricks App
+
+on:
+  push:
+    branches:
+      - dev
+      - stage
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  APP_SOURCE_PATH: ./app
+  DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'dev' && 'dev' || github.ref_name == 'stage' && 'staging' || 'prod' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: app/frontend/package-lock.json
+
+      - name: Build frontend assets
+        working-directory: app/frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Configure Databricks authentication profile
+        env:
+          DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+        run: |
+          mkdir -p "$HOME"
+          cat > "$HOME/.databrickscfg" <<EOF
+          [GH_ACTIONS]
+          host = ${DATABRICKS_HOST}
+          client_id = ${DATABRICKS_CLIENT_ID}
+          client_secret = ${DATABRICKS_CLIENT_SECRET}
+          EOF
+          chmod 600 "$HOME/.databrickscfg"
+
+      - name: Resolve environment app name
+        id: resolve_app_name
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "dev" ]; then
+            echo "app_name=deep-agent-memory-dev" >> "$GITHUB_OUTPUT"
+          elif [ "${GITHUB_REF_NAME}" = "stage" ]; then
+            echo "app_name=deep-agent-memory-staging" >> "$GITHUB_OUTPUT"
+          else
+            echo "app_name=deep-agent-memory-prod" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ensure app exists
+        run: |
+          APP_NAME="${{ steps.resolve_app_name.outputs.app_name }}"
+          if ! databricks apps get "$APP_NAME" --profile GH_ACTIONS >/dev/null 2>&1; then
+            databricks apps create "$APP_NAME" --profile GH_ACTIONS
+          fi
+
+      - name: Deploy app
+        run: |
+          APP_NAME="${{ steps.resolve_app_name.outputs.app_name }}"
+          databricks apps deploy "$APP_NAME" \
+            --source-code-path "$APP_SOURCE_PATH" \
+            --profile GH_ACTIONS

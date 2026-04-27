@@ -104,6 +104,31 @@ databricks apps deploy deep-agent-memory --source-code-path ./07_Deep_Agents/app
 
 The `app.yaml` configures the uvicorn command and environment variables. The built React app is served as static files by FastAPI.
 
+## Branch-based CI/CD deployment
+
+This repository includes `.github/workflows/databricks-app-deploy.yml` to deploy the same source code to three Databricks Apps in the same workspace.
+
+| Branch | GitHub Environment | Databricks App Name |
+|---|---|---|
+| `dev` | `dev` | `deep-agent-memory-dev` |
+| `stage` | `staging` | `deep-agent-memory-staging` |
+| `main` | `prod` | `deep-agent-memory-prod` |
+
+### Required GitHub configuration
+
+Create these GitHub **Environments**: `dev`, `staging`, `prod`.
+
+For each environment, set secrets:
+
+- `DATABRICKS_CLIENT_ID`
+- `DATABRICKS_CLIENT_SECRET`
+
+Also set repository variable:
+
+- `DATABRICKS_HOST` (same Databricks workspace host for all environments)
+
+When code is pushed to `dev`, `stage`, or `main`, the workflow creates the corresponding app (if missing) and deploys the latest app code.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
