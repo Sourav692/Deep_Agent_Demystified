@@ -73,10 +73,20 @@ class LakebaseMemoryStore:
         )
 
     def ensure_table(self):
-        """Create the memories table if it doesn't exist."""
+        """Create the memories table only if it doesn't already exist.
+
+        Checks first via ``to_regclass`` so that callers without CREATE
+        privilege on the schema (e.g. a service principal with only DML
+        grants) can still initialise — the deployed app typically falls in
+        this category since the table is provisioned once during dev.
+        """
         with self._connect() as conn, conn.cursor() as cur:
+            cur.execute("SELECT to_regclass(%s)", (FULL_TABLE,))
+            exists = cur.fetchone()[0] is not None
+            if exists:
+                return
             cur.execute(f"""
-                CREATE TABLE IF NOT EXISTS {FULL_TABLE} (
+                CREATE TABLE {FULL_TABLE} (
                     id UUID PRIMARY KEY,
                     user_id TEXT NOT NULL,
                     content TEXT NOT NULL,
@@ -85,7 +95,7 @@ class LakebaseMemoryStore:
                 )
             """)
             cur.execute(f"""
-                CREATE INDEX IF NOT EXISTS agent_memories_user_saved_idx
+                CREATE INDEX agent_memories_user_saved_idx
                 ON {FULL_TABLE} (user_id, saved_at DESC)
             """)
 
