@@ -12,7 +12,6 @@ permissions:
   contents: read
 
 env:
-  APP_SOURCE_PATH: ./app
   DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
 
 jobs:
@@ -28,54 +27,44 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: app/frontend/package-lock.json
 
       - name: Build frontend assets
         working-directory: app/frontend
+        env:
+          NODE_ENV: development
         run: |
-          npm ci
+          # package-lock.json resolved URLs point to an internal Databricks
+          # npm proxy that GitHub-hosted runners cannot reach; rewrite to
+          # the public registry. Integrity hashes remain valid (same bytes).
+          sed -i 's|https://npm-proxy\.dev\.databricks\.com/|https://registry.npmjs.org/|g' package-lock.json
+          npm ci --include=dev --registry=https://registry.npmjs.org/ --no-audit --no-fund
           npm run build
 
       - name: Setup Databricks CLI
         uses: databricks/setup-cli@main
 
-      - name: Configure Databricks authentication profile
+      - name: Resolve bundle target
+        id: target
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "dev" ]; then
+            echo "name=dev" >> "$GITHUB_OUTPUT"
+          elif [ "${GITHUB_REF_NAME}" = "stage" ]; then
+            echo "name=staging" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=prod" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bundle deploy
         env:
           DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
           DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
-        run: |
-          mkdir -p "$HOME"
-          cat > "$HOME/.databrickscfg" <<EOF
-          [GH_ACTIONS]
-          host = ${DATABRICKS_HOST}
-          client_id = ${DATABRICKS_CLIENT_ID}
-          client_secret = ${DATABRICKS_CLIENT_SECRET}
-          EOF
-          chmod 600 "$HOME/.databrickscfg"
+        run: databricks bundle deploy -t ${{ steps.target.outputs.name }}
 
-      - name: Resolve environment app name
-        id: resolve_app_name
-        run: |
-          if [ "${GITHUB_REF_NAME}" = "dev" ]; then
-            echo "app_name=deep-agent-memory-dev" >> "$GITHUB_OUTPUT"
-          elif [ "${GITHUB_REF_NAME}" = "stage" ]; then
-            echo "app_name=deep-agent-memory-staging" >> "$GITHUB_OUTPUT"
-          else
-            echo "app_name=deep-agent-memory-prod" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Ensure app exists
-        run: |
-          APP_NAME="${{ steps.resolve_app_name.outputs.app_name }}"
-          if ! databricks apps get "$APP_NAME" --profile GH_ACTIONS >/dev/null 2>&1; then
-            databricks apps create "$APP_NAME" --profile GH_ACTIONS
-          fi
-
-      - name: Deploy app
-        run: |
-          APP_NAME="${{ steps.resolve_app_name.outputs.app_name }}"
-          databricks apps deploy "$APP_NAME" \
-            --source-code-path "$APP_SOURCE_PATH" \
-            --profile GH_ACTIONS
+      - name: Bundle run (start app)
+        env:
+          DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+        run: databricks bundle run deep_agent_memory -t ${{ steps.target.outputs.name }}

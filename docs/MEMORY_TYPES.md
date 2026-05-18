@@ -1,4 +1,4 @@
-# Memory Types in Deep Agents
+# Memory Types in Deep Agent
 
 This document describes every memory and persistence mechanism available in the deep agent system, how they work, and where data lives.
 

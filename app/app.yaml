@@ -1,9 +1,11 @@
-# Databricks App configuration
-# Deploy with: databricks apps deploy deep-agent-memory --source-code-path ./07_Deep_Agents/app
+# Databricks App configuration.
+# Deployed via the bundle in /databricks.yml (target = dev|staging|prod).
 
 command:
   - uvicorn
-  - backend.main:app
+  - deep_agent.main:app
+  - --app-dir
+  - backend/src
   - --host
   - 0.0.0.0
   - --port
@@ -16,3 +18,15 @@ env:
     valueFrom: DATABRICKS_HOST
   - name: DATABRICKS_TOKEN
     valueFrom: DATABRICKS_TOKEN
+  - name: LAKEBASE_INSTANCE_NAME
+    value: deep-agent-memory
+  - name: LAKEBASE_DATABASE
+    value: databricks_postgres
+
+resources:
+  - name: lakebase-memory
+    description: "Lakebase Postgres for long-term memory"
+    database:
+      instance_name: deep-agent-memory
+      database_name: databricks_postgres
+      permission: CAN_CONNECT_AND_CREATE
