@@ -429,7 +429,8 @@ def _create_backend():
 checkpointer = MemorySaver()
 
 model = ChatDatabricks(
-    endpoint="databricks-claude-opus-4-7",
+    endpoint="databricks-claude-sonnet-4-6",
+    temperature=0.1,
 )
 
 agent = create_deep_agent(
