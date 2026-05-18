@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated agent workspace + artifacts (do NOT check in)
+workspace_pptx/
+large_tool_results/
+app/backend/projects/
+projects/
+*.pptx
+
+# OS
+.DS_Store
