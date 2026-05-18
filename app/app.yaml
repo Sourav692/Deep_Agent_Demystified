@@ -13,7 +13,7 @@ command:
 
 env:
   - name: TAVILY_API_KEY
-    valueFrom: TAVILY_API_KEY
+    valueFrom: tavily-api-key
   - name: DATABRICKS_HOST
     valueFrom: DATABRICKS_HOST
   - name: DATABRICKS_TOKEN
@@ -30,3 +30,9 @@ resources:
       instance_name: deep-agent-memory
       database_name: databricks_postgres
       permission: CAN_CONNECT_AND_CREATE
+  - name: tavily-api-key
+    description: "Tavily web search API key"
+    secret:
+      scope: deep-agent
+      key: tavily-api-key
+      permission: READ
