@@ -431,6 +431,7 @@ checkpointer = MemorySaver()
 model = ChatDatabricks(
     endpoint="databricks-claude-opus-4-6",
     temperature=0.1,
+    disable_streaming=True,
 )
 
 agent = create_deep_agent(
