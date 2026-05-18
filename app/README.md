@@ -19,7 +19,7 @@ A React + FastAPI web application for the Deep Agent multi-agent orchestrator wi
 ## Features
 
 - **Multi-agent orchestration** — 8 specialized subagents (memory, coding, research, 4x analytics)
-- **Long-term memory** — persisted to a Delta table (`aia_multi_agent_catalog.default.agent_memories`)
+- **Long-term memory** — persisted to a Databricks Lakebase (Postgres) instance, table `public.agent_memories`
 - **SSE streaming** — real-time agent responses with node/subagent indicators
 - **Markdown rendering** — AI responses render with syntax-highlighted code blocks, tables, lists
 - **Memory panel** — view, search, create, and delete stored memories in the sidebar
@@ -30,18 +30,25 @@ A React + FastAPI web application for the Deep Agent multi-agent orchestrator wi
 
 ## Memory Storage
 
-Memories are stored in a Delta table in Unity Catalog:
+Memories are stored in a Databricks Lakebase (Postgres) instance:
 
 ```
-aia_multi_agent_catalog.default.agent_memories
-├── id         STRING    (UUID)
-├── user_id    STRING    (default-user)
-├── content    STRING    (the memory text)
-├── category   STRING    (preference, fact, decision, project, feedback)
-└── saved_at   TIMESTAMP
+{LAKEBASE_DATABASE}.public.agent_memories
+├── id         UUID         (primary key)
+├── user_id    TEXT         (default-user)
+├── content    TEXT         (the memory text)
+├── category   TEXT         (preference, fact, decision, project, feedback)
+└── saved_at   TIMESTAMPTZ
 ```
 
-The table is auto-created on first startup. Requires a running SQL warehouse (auto-detected).
+The table is auto-created on first startup. Requires the following env vars:
+
+- `LAKEBASE_INSTANCE_NAME` — Lakebase database instance name (required)
+- `LAKEBASE_DATABASE` — Postgres database name (default: `databricks_postgres`)
+
+Connections use short-lived OAuth tokens issued via the Databricks SDK
+(`WorkspaceClient.database.generate_database_credential`); no static password
+is configured.
 
 ## Local Development
 

@@ -16,3 +16,7 @@ env:
     valueFrom: DATABRICKS_HOST
   - name: DATABRICKS_TOKEN
     valueFrom: DATABRICKS_TOKEN
+  - name: LAKEBASE_INSTANCE_NAME
+    value: deep-agent-memory
+  - name: LAKEBASE_DATABASE
+    value: databricks_postgres

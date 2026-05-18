@@ -1,7 +1,8 @@
 """Deep agent with long-term memory, wired for the FastAPI backend.
 
 Exposes a pre-built agent and memory tools that the API layer calls.
-Memory tools use DatabricksSQLMemoryStore instead of JSON files.
+Memory tools use LakebaseMemoryStore (Databricks Lakebase / Postgres) instead
+of JSON files.
 """
 
 import os
@@ -16,9 +17,9 @@ from tavily import TavilyClient
 from databricks.sdk import WorkspaceClient
 
 try:
-    from backend.memory_store import DatabricksSQLMemoryStore, DEFAULT_USER_ID
+    from backend.memory_store import LakebaseMemoryStore, DEFAULT_USER_ID
 except ImportError:
-    from memory_store import DatabricksSQLMemoryStore, DEFAULT_USER_ID
+    from memory_store import LakebaseMemoryStore, DEFAULT_USER_ID
 
 
 # ============ Directories ============
@@ -36,7 +37,7 @@ os.makedirs(PROJECTS_DIR, exist_ok=True)
 
 
 # ============ Memory store ============
-memory_db = DatabricksSQLMemoryStore()
+memory_db = LakebaseMemoryStore()
 
 
 # ============ Memory tools (called by the LLM) ============

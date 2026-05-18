@@ -68,10 +68,10 @@ def _get_memory_db():
         return _memory_db
     try:
         try:
-            from backend.memory_store import DatabricksSQLMemoryStore
+            from backend.memory_store import LakebaseMemoryStore
         except ImportError:
-            from memory_store import DatabricksSQLMemoryStore
-        _memory_db = DatabricksSQLMemoryStore()
+            from memory_store import LakebaseMemoryStore
+        _memory_db = LakebaseMemoryStore()
         _memory_db.ensure_table()
     except Exception as e:
         logger.error(f"Memory store init failed: {e}")
