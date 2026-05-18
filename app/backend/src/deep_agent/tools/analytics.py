@@ -1,13 +1,26 @@
 """Databricks Genie analytics tools — natural-language Q&A over AIA data."""
 
+import logging
+
 from deep_agent.clients import get_workspace_client
 from deep_agent.config import GENIE_SPACES
 
+logger = logging.getLogger("deep-agent")
+
 
 def _query_genie(space_id: str, question: str) -> dict:
-    resp = get_workspace_client().genie.start_conversation_and_wait(
-        space_id=space_id, content=question,
-    )
+    # Tool exceptions kill the parent agent's stream. Catch here so a single
+    # bad Genie space (trashed, permissions, transient API error) doesn't
+    # crash the whole multi-step run — the agent gets an error string back
+    # and can synthesise around it.
+    try:
+        resp = get_workspace_client().genie.start_conversation_and_wait(
+            space_id=space_id, content=question,
+        )
+    except Exception as e:
+        logger.warning(f"Genie query failed (space={space_id}): {e}")
+        return {"error": str(e), "space_id": space_id}
+
     result: dict = {
         "status": str(resp.status),
         "conversation_id": resp.conversation_id,
