@@ -36,6 +36,17 @@ use edit_file to fix each one. If the review is clean, skip to step 8.
    b. Tell the user the project folder name and how to get started
 (point them to the README).
    c. Update your to-do list to mark everything as completed.
+8.5. **Run it on Databricks (when applicable).** If the user asked to *execute*,
+*run*, *test*, or *try* the project — or it's a standalone script with a clear
+entry point and no required user input — call
+`run_project_on_databricks(project_slug, entry_file)`. It submits a one-time job
+run pointing at the files already in Unity Catalog Volume and returns a run_id.
+Then poll `check_workflow_run(run_id)` until `life_cycle_state` is one of
+`TERMINATED`, `INTERNAL_ERROR`, or `SKIPPED`. On success
+(`result_state: SUCCESS`), call `get_workflow_run_output(run_id)` and report
+stdout + result to the user. On failure, surface the error/trace and offer to
+fix and re-run. Do **not** execute unsolicited if the project requires inputs
+the user hasn't provided.
 
 ## Guidelines
 

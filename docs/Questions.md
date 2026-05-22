@@ -167,7 +167,12 @@ These combine long-term memory with other capabilities:
 
 > "~~Build me an executive summary report: pull total customers by segment, total premiums by channel, top 10 agents, and fraud hotspots from our data. Then research how AIA compares to competitors in the Thai insurance market. Finally, write a Python script that generates this as a formatted PDF report."~~
 
-*> *\
-> Build me a fraud risk report: pull our top customer segments by size, top 5 agents by premium volume, and the regions with highest fraud activity from our data. Then research current insurance fraud detection best*
+ 
+
+> Build me a fraud risk report: pull our top customer segments by size, top 5 agents by premium volume, and the regions with highest fraud activity from our data. Then research current insurance fraud detection best practices.
 
 → All 4 AIA + `research-agent` + `senior-developer` + `code-reviewer`
+
+ 
+
+Build a Python project that prints the first 10 Fibonacci numbers and run it on Databricks.

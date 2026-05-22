@@ -20,12 +20,20 @@ from deep_agent.tools.projects import (
     write_project_file,
 )
 from deep_agent.tools.search import internet_search
+from deep_agent.tools.workflows import (
+    check_workflow_run,
+    get_workflow_run_output,
+    run_project_on_databricks,
+)
 
 
 ORCHESTRATOR_TOOLS = [
     name_project,
     write_project_file,
     list_project_files,
+    run_project_on_databricks,
+    check_workflow_run,
+    get_workflow_run_output,
     internet_search,
     save_memory,
     recall_memories,

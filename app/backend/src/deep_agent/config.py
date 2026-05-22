@@ -29,6 +29,15 @@ VOLUME_BASE = os.environ.get(
 )
 
 
+# ============ Workflows (Databricks Jobs execution) ============
+WORKFLOW_USE_SERVERLESS = os.environ.get("WORKFLOW_USE_SERVERLESS", "true").lower() == "true"
+WORKFLOW_CLUSTER_ID = os.environ.get("WORKFLOW_CLUSTER_ID", "")
+WORKFLOW_ENVIRONMENT_SPEC_VERSION = os.environ.get("WORKFLOW_ENVIRONMENT_SPEC_VERSION", "2")
+WORKFLOW_DEFAULT_TIMEOUT_SECONDS = int(os.environ.get("WORKFLOW_DEFAULT_TIMEOUT_SECONDS", "1800"))
+# Workspace dir where Volume files are staged before submission. Empty = derive from current user.
+WORKFLOW_WORKSPACE_BASE = os.environ.get("WORKFLOW_WORKSPACE_BASE", "")
+
+
 # ============ Lakebase (Postgres long-term memory) ============
 LAKEBASE_INSTANCE_NAME = os.environ.get("LAKEBASE_INSTANCE_NAME", "deep-agent-memory")
 LAKEBASE_DATABASE = os.environ.get("LAKEBASE_DATABASE", "databricks_postgres")

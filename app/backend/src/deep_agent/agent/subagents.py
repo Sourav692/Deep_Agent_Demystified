@@ -13,6 +13,11 @@ from deep_agent.tools.projects import (
     write_project_file,
 )
 from deep_agent.tools.search import internet_search
+from deep_agent.tools.workflows import (
+    check_workflow_run,
+    get_workflow_run_output,
+    run_project_on_databricks,
+)
 
 
 _SKILLS = ["/skills/"]
@@ -34,7 +39,14 @@ senior_developer = {
     "description": "Senior Python developer that plans, writes, and delivers complete projects.",
     "system_prompt": "Follow the senior-developer skill instructions.",
     "skills": _SKILLS,
-    "tools": [name_project, write_project_file, list_project_files],
+    "tools": [
+        name_project,
+        write_project_file,
+        list_project_files,
+        run_project_on_databricks,
+        check_workflow_run,
+        get_workflow_run_output,
+    ],
 }
 
 code_reviewer = {
